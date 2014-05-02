@@ -17,24 +17,8 @@ then
 fi
 
 BASE="${WD}\\$(echo "$1" | sed -e "${TRAILFIX}")"
-LOCAL="${WD}\\$(echo "$2" | sed -e "${TRAILFIX}")"
-REMOTE="${WD}\\$(echo "$3" | sed -e  "${TRAILFIX}")"
-MERGED=$REMOTE
-
+THEIRS="${WD}\\$(echo "$2" | sed -e "${TRAILFIX}")"
+YOURS="${WD}\\$(echo "$3" | sed -e  "${TRAILFIX}")"
+MERGED="${WD}\\$(echo "$4" | sed -e  "${TRAILFIX}")"
 # Execute Compare
-"${LabViewShared}/LabVIEW Merge/LVMerge.exe" "${LabViewBin}" "${BASE}" "${REMOTE}" "${LOCAL}" "${MERGED}"
-
-for i in {0..99}; do
-    read -p "Was the merge successful (yes/no)?" yn
-    case $yn in
-        [Yy]* ) echo "Merge successful."; exit 0;;
-        [Nn]* ) echo "Merge unsuccessful. Please fix with 'git mergetool -t labview'"; exit 255;;
-        * ) echo "Please answer yes or no.";;
-    esac
-done
-
-echo "It seems you either can't type or you are using gitk. For the latter "
-echo "one I have no means of knowing wether the merge succeeded or not, "
-echo "so I have to stop the merge and you have to commit it manually."
-
-exit 255
+"${LabViewShared}/LabVIEW Merge/LVMerge.exe" "${LabViewBin}" "${BASE}" "${THEIRS}" "${YOURS}" "${MERGED}"

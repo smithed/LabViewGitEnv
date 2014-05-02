@@ -16,12 +16,14 @@ then
 	source ./LVConfig.sh
 fi
 
-LOCAL=$(echo "$2" | sed -e "${PATHFIX}")
-REMOTE=$(echo "$5" | sed -e  "${PATHFIX}")
+
+LOCAL=$(echo "$1" | sed -e "${PATHFIX}")
+REMOTE=$(echo "$2" | sed -e  "${PATHFIX}")
 
 # Check if absolute path and complete with working directory if not
 echo "$LOCAL" | grep -qE $ABSPATH || LOCAL="${WD}\\${LOCAL}"
 echo "$REMOTE" | grep -qE $ABSPATH || REMOTE="${WD}\\${REMOTE}"
 
+
 # Execute Compare
-"${LabViewShared}/LabVIEW Compare/LVCompare.exe" "${LOCAL}" "${REMOTE}" "-lvpath" "${LabViewBin}"
+"${LabViewShared}/LabVIEW Compare/LVCompare.exe" "${REMOTE}" "${LOCAL}" "-lvpath" "${LabViewBin}"
