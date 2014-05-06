@@ -10,7 +10,7 @@ function do_git_config {
 	$1 difftool.lvdifftool.prompt false
 	$1 merge.lvmerge.tool lvmergetool
 	$1 merge.lvmerge.name "LabView Merge Driver"
-	$1 merge.lvmerge.driver "LVMergeWrapper.sh \"%O\" \"%B\" \"%A\" \"%M\""
+	$1 merge.lvmerge.driver "LVMergeWrapper.sh \"%O\" \"%B\" \"%A\" \"%A\""
 	$1 mergetool.lvmergetool.cmd "LVMergeWrapper.sh \"\$BASE\" \"\$REMOTE\" \"\$LOCAL\" \"\$MERGED\"" 
 	$1 mergetool.lvmergetool.trustExitCode true
 	if [ $OPT == "--global" ]
@@ -45,9 +45,12 @@ esac
 # Set git config
 do_git_config "git config ${GIT_CONFIG_OPTS}"
 
-# Create attributes file if missing and write specifics
-#ATTRIBUTES_FILE_ABSOLUTE=$(echo ${ATTRIBUTES_FILE})
-#touch ${ATTRIBUTES_FILE_ABSOLUTE}
+if [ "$2" != "-noa" ]
+then
+	# Create attributes file if missing and write specifics
+	ATTRIBUTES_FILE_ABSOLUTE=$(echo ${ATTRIBUTES_FILE})
+	touch ${ATTRIBUTES_FILE_ABSOLUTE}
 
-#CONT=$(cat ~/etc/LVGitAttributes.tpl 2>/dev/null || cat /usr/local/etc/LVGitAttributes.tpl 2>/dev/null)
-#grep -q "${CONT}" ${ATTRIBUTES_FILE_ABSOLUTE} || echo "${CONT}" >> ${ATTRIBUTES_FILE_ABSOLUTE}
+	CONT=$(cat ~/etc/LVGitAttributes.tpl 2>/dev/null || cat /usr/local/etc/LVGitAttributes.tpl 2>/dev/null)
+	grep -q "${CONT}" ${ATTRIBUTES_FILE_ABSOLUTE} || echo "${CONT}" >> ${ATTRIBUTES_FILE_ABSOLUTE}
+fi
