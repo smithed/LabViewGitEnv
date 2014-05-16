@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # Read System wide config
 if [ -e /usr/local/etc/LVConfig.sh ]
@@ -15,9 +15,14 @@ if [ -e ./LVConfig.sh ]
 then
 	source ./LVConfig.sh
 fi
+# Check nearby
+if [ -e ../etc/LVConfig.sh ]
+then
+	source ../etc/LVConfig.sh
+fi
 
 # Repository directory in windows path notation
-WD=$(pwd | sed -e "${ENDFIX}" | sed -e "${MKWINPATH}" | sed -e  "${PATHFIX}")
+WD=$(toFullWindowsPath $(pwd))
 
 #The following used to have an issue in sourcetree in some cases, where the path would be ./ (remleaddot)
 #I think this makes trailfix invalid, but I wasn't sure why it didn't work in the first place so I left it
@@ -25,33 +30,25 @@ WD=$(pwd | sed -e "${ENDFIX}" | sed -e "${MKWINPATH}" | sed -e  "${PATHFIX}")
 #Finally we take the windows form of the working dir and since the relative paths have no leading token, we just concatenate
 #This covers issues with ./blah.vi, for example, as well as \folder1\folder2\test.vi
 
+BASE=$1
+THEIRS=$2
+YOURS=$3
+MERGED=$4
 
-#BASE="${WD}\\$(echo "$1" | sed -e "${TRAILFIX}")"
-BASE=$(echo "$1" | sed -e "${REMLEADDOT}")
-BASE=$(echo "$BASE" | sed -e "${PATHFIX}")
-BASE=$(echo "$BASE" | sed -e "${TRAILFIX}")
-BASE="${WD}\\$(echo "$BASE")"
+BASE=$(toUnpackedLinuxPath "$BASE")
+THEIRS=$(toUnpackedLinuxPath "$THEIRS")
+YOURS=$(toUnpackedLinuxPath "$YOURS")
+MERGED=$(toUnpackedLinuxPath "$MERGED")
 
-#THEIRS="${WD}\\$(echo "$2" | sed -e "${TRAILFIX}")"
-THEIRS=$(echo "$2" | sed -e "${REMLEADDOT}")
-THEIRS=$(echo "$THEIRS" | sed -e "${PATHFIX}")
-THEIRS=$(echo "$THEIRS" | sed -e "${TRAILFIX}")
-THEIRS="${WD}\\$(echo "$THEIRS")"
+BASE=$(toFullWindowsPath "$BASE")
+THEIRS=$(toFullWindowsPath "$THEIRS")
+YOURS=$(toFullWindowsPath "$YOURS")
+MERGED=$(toFullWindowsPath "$MERGED")
 
-#YOURS="${WD}\\$(echo "$3" | sed -e  "${TRAILFIX}")"
-YOURS=$(echo "$3" | sed -e "${REMLEADDOT}")
-YOURS=$(echo "$YOURS" | sed -e "${PATHFIX}")
-YOURS=$(echo "$YOURS" | sed -e "${TRAILFIX}")
-YOURS="${WD}\\$(echo "$YOURS")"
-
-#MERGED="${WD}\\$(echo "$4" | sed -e  "${TRAILFIX}")"
-MERGED=$(echo "$4" | sed -e "${REMLEADDOT}")
-MERGED=$(echo "$MERGED" | sed -e "${PATHFIX}")
-MERGED=$(echo "$MERGED" | sed -e "${TRAILFIX}")
-MERGED="${WD}\\$(echo "$MERGED")"
+BASE=$(addWorkingDir "$BASE" "$WD")
+THEIRS=$(addWorkingDir "$THEIRS" "$WD")
+YOURS=$(addWorkingDir "$YOURS" "$WD")
+MERGED=$(addWorkingDir "$MERGED" "$WD")
 
 # Execute Compare
 "${LabViewShared}\LabVIEW Merge\LVMerge.exe" "${LabViewBin}" "${BASE}" "${THEIRS}" "${YOURS}" "${MERGED}"
-
-#make sure the tool doesn't delete everything before merge completed
-sleep 5

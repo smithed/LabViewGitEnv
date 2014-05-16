@@ -3,16 +3,20 @@
 OPT=$(echo $1 | tr "[:upper:]" "[:lower:]")
 
 function do_git_config {
-	$1 diff.lvdiff.command "LVCompareWrapper.sh"
-	$1 diff.lvdiff.tool lvdifftool
-	$1 diff.lvdiff.guitool lvdifftool
-	$1 difftool.lvdifftool.cmd "LVCompareWrapper.sh \"\$LOCAL\" \"\$REMOTE\""
-	$1 difftool.lvdifftool.prompt false
-	$1 merge.lvmerge.tool lvmergetool
-	$1 merge.lvmerge.name "LabView Merge Driver"
-	$1 merge.lvmerge.driver "LVMergeWrapper.sh \"%O\" \"%B\" \"%A\" \"%A\""
-	$1 mergetool.lvmergetool.cmd "LVMergeWrapper.sh \"\$BASE\" \"\$REMOTE\" \"\$LOCAL\" \"\$MERGED\"" 
-	$1 mergetool.lvmergetool.trustExitCode true
+	$1 --remove-section diff.labview
+	$1 diff.labview.command "${DIFFCMD}"
+	$1 diff.labview.tool labview
+	$1 diff.labview.guitool labview
+	$1 --remove-section difftool.labview
+	$1 difftool.labview.cmd "${DIFFCMD} \"\$LOCAL\" \"\$REMOTE\""
+	$1 difftool.labview.prompt false
+	$1 --remove-section merge.labview
+	$1 merge.labview.tool labview
+	$1 merge.labview.name "LabView Merge Driver"
+	$1 merge.labview.driver "${MERGECMD} \"%O\" \"%B\" \"%A\" \"%A\""
+	$1 --remove-section mergetool.labview
+	$1 mergetool.labview.cmd "${MERGECMD} \"\$BASE\" \"\$REMOTE\" \"\$LOCAL\" \"\$MERGED\""
+	$1 mergetool.labview.trustExitCode false
 	if [ $OPT == "--global" ]
 	then
 		$1 core.attributesfile $ATTRIBUTES_FILE
@@ -23,15 +27,21 @@ case "$OPT" in
 	--system)
 		GIT_CONFIG_OPTS="--system"
 		ATTRIBUTES_FILE=/etc/gitattributes
+		DIFFCMD='"/usr/local/bin/LVCompareWrapper.sh"'
+		MERGECMD='"/usr/local/bin/LVMergeWrapper.sh"'
 	;;
 	--global)
 		GIT_CONFIG_OPTS="--global"
 		ATTRIBUTES_FILE=~/.gitattributes
+		DIFFCMD='"~/bin/LVCompareWrapper.sh"'
+		MERGECMD='"~/bin/LVMergeWrapper.sh"'
 	;;
 	--local)
 		git status &> /dev/null || { echo "You are not in a GIT Repository"; exit 0; }
 		GIT_CONFIG_OPTS="--local"
 		ATTRIBUTES_FILE=.git/info/attributes
+		DIFFCMD='"'$(PWD)'/bin/LVCompareWrapper.sh"'
+		MERGECMD='"'$(PWD)'/bin/LVMergeWrapper.sh"'
 	;;
 	*) 
 		echo -e "Usage: \"$0 option\" where option can be one of the following
@@ -45,12 +55,10 @@ esac
 # Set git config
 do_git_config "git config ${GIT_CONFIG_OPTS}"
 
-if [ "$2" != "-noa" ]
-then
-	# Create attributes file if missing and write specifics
-	ATTRIBUTES_FILE_ABSOLUTE=$(echo ${ATTRIBUTES_FILE})
-	touch ${ATTRIBUTES_FILE_ABSOLUTE}
 
-	CONT=$(cat ~/etc/LVGitAttributes.tpl 2>/dev/null || cat /usr/local/etc/LVGitAttributes.tpl 2>/dev/null)
-	grep -q "${CONT}" ${ATTRIBUTES_FILE_ABSOLUTE} || echo "${CONT}" >> ${ATTRIBUTES_FILE_ABSOLUTE}
-fi
+# Create attributes file if missing and write specifics
+ATTRIBUTES_FILE_ABSOLUTE=$(echo ${ATTRIBUTES_FILE})
+touch ${ATTRIBUTES_FILE_ABSOLUTE}
+
+CONT=$(cat ~/etc/LVGitAttributes.tpl 2>/dev/null || cat /usr/local/etc/LVGitAttributes.tpl 2>/dev/null)
+grep -q "${CONT}" ${ATTRIBUTES_FILE_ABSOLUTE} || echo "${CONT}" >> ${ATTRIBUTES_FILE_ABSOLUTE}

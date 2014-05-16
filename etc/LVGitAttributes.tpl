@@ -1,5 +1,5 @@
-*.vi diff=lvdiff difftool=lvdifftool mergetool=lvmergetool merge=lvmerge
-*.vit diff=lvdiff difftool=lvdifftool mergetool=lvmergetool merge=lvmerge
-*.llb mergetool=lvmergetool merge=lvmerge
-*.ctl diff=lvdiff difftool=lvdifftool
-*.ctt diff=lvdiff difftool=lvdifftool
+*.vi diff=labview difftool=labview mergetool=labview merge=labview
+*.vit diff=labview difftool=labview mergetool=labview merge=labview
+*.llb mergetool=labview merge=labview
+*.ctl diff=labview difftool=labview
+*.ctt diff=labview difftool=labview
