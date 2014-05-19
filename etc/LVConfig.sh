@@ -41,27 +41,27 @@ toUnpackedLinuxPath ()
 tPath=$1
 
 #Convert to fw slash so we can concatenate with everything else we are manipulating. This will be reversed later, if it even did anything here
-tPath=$(echo "$tPath" | sed -e "${FWSPATH}")
+tPath=$(echo "${tPath}" | sed -e "${FWSPATH}")
 
 #In case sourcetree was lying to us and said, for example, the working dir is /usr/blah or /tmp/blah.
 #TEMP should happen first because the eval causes issues with program files (x86)
 #should find a better way of doing this
-tPath=$(echo "$tPath" | sed -e "${FIXSYMTMP}")
-tPath=$(eval echo "$tPath")
-tPath=$(echo "$tPath" | sed -e  "${FIXSYMUSR}")
+tPath=$(echo "${tPath}" | sed -e "${FIXSYMTMP}")
+tPath=$(eval echo "${tPath}")
+tPath=$(echo "${tPath}" | sed -e  "${FIXSYMUSR}")
 
 #fix ./* and replace with PWD/*
 TEMPVAR=""
-echo "$tPath" | grep -qE $REGLOCALDIR || TEMPVAR="OK"
+echo "${tPath}" | grep -qE $REGLOCALDIR || TEMPVAR="OK"
 if [ "$TEMPVAR" != "OK" ]
 then
-	tPath=$(echo "$tPath" | sed -e "${REMLEADDOT}")
+	tPath=$(echo "${tPath}" | sed -e "${REMLEADDOT}")
 	tPath="$(pwd)/${tPath}"
 fi
 
 
 #return
-echo $tPath
+echo ${tPath}
 }
 
 toFullWindowsPath ()
@@ -69,13 +69,13 @@ toFullWindowsPath ()
 tPath=$1
 
 #convert any full path /c/ to c:\ (must happen before converting to bslash)
-tPath=$(echo "$tPath" | sed -e  "${MKWINPATH}")
+tPath=$(echo "${tPath}" | sed -e  "${MKWINPATH}")
 
 #Convert to backslash fix paths to windows
-tPath=$(echo "$tPath" | sed -e "${PATHFIX}")
+tPath=$(echo "${tPath}" | sed -e "${PATHFIX}")
 
 #return
-echo $tPath
+echo ${tPath}
 }
 
 addWorkingDir ()
@@ -84,24 +84,24 @@ tPath=$1
 WD=$2
 #remove ending /\
 WD=$(echo "$WD" | sed -e "${ENDFIX}")
-echo "$tPath" | grep -qE $ABSPATH || tPath="${WD}\\${tPath}"
-echo $tPath
+echo "${tPath}" | grep -qE $ABSPATH || tPath="${WD}\\${tPath}"
+echo ${tPath}
 }
 
 resolveRelPath ()
 {
 tPath=$1
 tRelPath=$2
-if [ ! -e "$tPath" ]
+if [ ! -e "${tPath}" ]
 then
-	TEMP=$tPath
+	TEMP=${tPath}
 	RELBASE=$tRelPath
-	while [ ! -e "$TEMP" ];	do
+	while [ ! -e "${TEMP}" ];	do
 	#split off the last path delimiter from RELBASE (ie /blah/foo/1.vi becomes /blah/foo and then /blah)
 		LASTBASE=$RELBASE
 		RELBASE=${RELBASE%/*}
 		#concat the base path with the local path
-		TEMP=$RELBASE"/"$tPath
+		TEMP="${RELBASE}/${tPath}"
 		#stop if we've reached something we can't work on, like "/" or "~"
 		if [ "$LASTBASE" == "$RELBASE" ]
 		then	
@@ -111,8 +111,8 @@ then
 	if [ -e "$TEMP" ]
 	then
 	#only set this if our TEMP exists...at the very least we want the original for error handling, and maybe we can do something else later.
-		tPath=$TEMP
+		tPath="${TEMP}"
 	fi
 fi
-echo $tPath
+echo "${tPath}"
 }
