@@ -53,7 +53,7 @@ tPath=$(echo "${tPath}" | sed -e  "${FIXSYMUSR}")
 #fix ./* and replace with PWD/*
 TEMPVAR=""
 echo "${tPath}" | grep -qE $REGLOCALDIR || TEMPVAR="OK"
-if [ "$TEMPVAR" != "OK" ]
+if [ "${TEMPVAR}" != "OK" ]
 then
 	tPath=$(echo "${tPath}" | sed -e "${REMLEADDOT}")
 	tPath="$(pwd)/${tPath}"
@@ -61,7 +61,7 @@ fi
 
 
 #return
-echo ${tPath}
+echo "${tPath}"
 }
 
 toFullWindowsPath ()
@@ -75,7 +75,7 @@ tPath=$(echo "${tPath}" | sed -e  "${MKWINPATH}")
 tPath=$(echo "${tPath}" | sed -e "${PATHFIX}")
 
 #return
-echo ${tPath}
+echo "${tPath}"
 }
 
 addWorkingDir ()
@@ -85,7 +85,7 @@ WD=$2
 #remove ending /\
 WD=$(echo "$WD" | sed -e "${ENDFIX}")
 echo "${tPath}" | grep -qE $ABSPATH || tPath="${WD}\\${tPath}"
-echo ${tPath}
+echo "${tPath}"
 }
 
 resolveRelPath ()
@@ -94,7 +94,7 @@ tPath=$1
 tRelPath=$2
 if [ ! -e "${tPath}" ]
 then
-	TEMP=${tPath}
+	TEMP=$tPath
 	RELBASE=$tRelPath
 	while [ ! -e "${TEMP}" ];	do
 	#split off the last path delimiter from RELBASE (ie /blah/foo/1.vi becomes /blah/foo and then /blah)
@@ -108,10 +108,10 @@ then
 			break
 		fi
 	done
-	if [ -e "$TEMP" ]
+	if [ -e "${TEMP}" ]
 	then
 	#only set this if our TEMP exists...at the very least we want the original for error handling, and maybe we can do something else later.
-		tPath="${TEMP}"
+		tPath=$TEMP
 	fi
 fi
 echo "${tPath}"
