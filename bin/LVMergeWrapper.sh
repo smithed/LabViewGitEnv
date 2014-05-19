@@ -35,20 +35,20 @@ THEIRS=$2
 YOURS=$3
 MERGED=$4
 
-BASE=$(toUnpackedLinuxPath "$BASE")
-THEIRS=$(toUnpackedLinuxPath "$THEIRS")
-YOURS=$(toUnpackedLinuxPath "$YOURS")
-MERGED=$(toUnpackedLinuxPath "$MERGED")
+BASE=$(toUnpackedLinuxPath "${BASE}")
+THEIRS=$(toUnpackedLinuxPath "${THEIRS}")
+YOURS=$(toUnpackedLinuxPath "${YOURS}")
+MERGED=$(toUnpackedLinuxPath "${MERGED}")
 
-BASE=$(toFullWindowsPath "$BASE")
-THEIRS=$(toFullWindowsPath "$THEIRS")
-YOURS=$(toFullWindowsPath "$YOURS")
-MERGED=$(toFullWindowsPath "$MERGED")
+BASE=$(toFullWindowsPath "${BASE}")
+THEIRS=$(toFullWindowsPath "${THEIRS}")
+YOURS=$(toFullWindowsPath "${YOURS}")
+MERGED=$(toFullWindowsPath "${MERGED}")
 
-BASE=$(addWorkingDir "$BASE" "$WD")
-THEIRS=$(addWorkingDir "$THEIRS" "$WD")
-YOURS=$(addWorkingDir "$YOURS" "$WD")
-MERGED=$(addWorkingDir "$MERGED" "$WD")
+BASE=$(addWorkingDir "${BASE}" "${WD}")
+THEIRS=$(addWorkingDir "${THEIRS}" "${WD}")
+YOURS=$(addWorkingDir "${YOURS}" "${WD}")
+MERGED=$(addWorkingDir "${MERGED}" "${WD}")
 
 # Execute Compare
 "${LabViewShared}\LabVIEW Merge\LVMerge.exe" "${LabViewBin}" "${BASE}" "${THEIRS}" "${YOURS}" "${MERGED}"
