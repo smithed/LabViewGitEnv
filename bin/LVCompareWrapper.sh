@@ -32,60 +32,60 @@ REMOTE=$(toUnpackedLinuxPath "$2")
 #That is, sourcetree may specify the wd as /tmp/blah/foo, vi A as tmp/blah/foo/1.vi, and vi B as /bar/1.vi, or something else odd
 #so what we need to do is take the various paths and do a limited search to see if we can find everything
 #what we are looking for is VI B=/tmp/blah/bar/1.vi
-LOCAL=$(resolveRelPath "$LOCAL" "$REMOTE")
-REMOTE=$(resolveRelPath "$REMOTE" "$LOCAL")
+LOCAL=$(resolveRelPath "${LOCAL}" "${REMOTE}")
+REMOTE=$(resolveRelPath "${REMOTE}" "${LOCAL}")
 
 
 #check if filenames match
 #get filename
-LOCALFILE=$(basename "$LOCAL")
+LOCALFILE=$(basename "${LOCAL}")
 #strip off everything before the last . (ie what is most likely ".vi" but could be something like ".llb"
 EXTENSION=${LOCALFILE##*.}
 #strip off last .X
 LOCALFILE=${LOCALFILE%.*}
 #same for remote except I am assuming extension is the same. If not, I think your scc is magic.
-REMOTEFILE=$(basename "$REMOTE")
+REMOTEFILE=$(basename "${REMOTE}")
 REMOTEFILE=${REMOTEFILE%.*}
 
 #The shipping lv diff tool can't support two files with the same name because it doesn't open the files in different contexts 
 #Opening in different contexts is how the Tools>>compare option works. We're going to have to manipulate the VI names.
-if [ "$LOCALFILE" == "$REMOTEFILE" ]
+if [ "${LOCALFILE}" == "${REMOTEFILE}" ]
 then
 	#get dir file is in
-	LOCALDIR=$(dirname "$LOCAL")
+	LOCALDIR=$(dirname "${LOCAL}")
 	#build up new filename, essentially the same as the old one except instead of foo.vi we have foo.3353.vi (where 3353 is a random number)
 	#this is a separate value so we can easily determine what we need to do later on.
-	LOCALTEMP=$LOCALDIR"/"$LOCALFILE"."$RANDOM"."$EXTENSION
+	LOCALTEMP="${LOCALDIR}/${LOCALFILE}.${RANDOM}.${EXTENSION}"
 fi
 
 #now that we've done our path manipulation and tried to find our files fix paths to windows
-WD=$(toFullWindowsPath "$WD")
-LOCAL=$(toFullWindowsPath "$LOCAL")
-REMOTE=$(toFullWindowsPath "$REMOTE")
+WD=$(toFullWindowsPath "${WD}")
+LOCAL=$(toFullWindowsPath "${LOCAL}")
+REMOTE=$(toFullWindowsPath "${REMOTE}")
 
 #If we have to, go ahead and fix the path of the temporary file as well
-if [ "$LOCALTEMP" != "" ]
+if [ "${LOCALTEMP}" != "" ]
 then
-	LOCALTEMP=$(toFullWindowsPath "$LOCALTEMP")
+	LOCALTEMP=$(toFullWindowsPath "${LOCALTEMP}")
 fi
 
 
 # Check if absolute path and complete with working directory if not
-LOCAL=$(addWorkingDir "$LOCAL" "$WD")
-REMOTE=$(addWorkingDir "$REMOTE" "$WD")
+LOCAL=$(addWorkingDir "${LOCAL}" "${WD}")
+REMOTE=$(addWorkingDir "${REMOTE}" "${WD}")
 
 #if we have a temp file, do the same
-if [ "$LOCALTEMP" != "" ]
+if [ "${LOCALTEMP}" != "" ]
 then
-	LOCALTEMP=$(addWorkingDir "$LOCALTEMP" "$WD")
+	LOCALTEMP=$(addWorkingDir "${LOCALTEMP}" "${WD}")
 fi
 
 #rename original file to the temp file with a random number in the name if we decided we had to earlier
 #for ease of coding, store the path we're actually using, whatever it is, in $LOCALACT
 LOCALACT=$LOCAL
-if [ "$LOCALTEMP" != "" ]
+if [ "${LOCALTEMP}" != "" ]
 then
-	mv "$LOCAL" "$LOCALTEMP"
+	mv "${LOCAL}" "${LOCALTEMP}"
 	LOCALACT=$LOCALTEMP
 fi
 
@@ -97,8 +97,8 @@ fi
 sleep 5
 
 #rename back to the original name so that the scc tool deletes the file
-if [ "$LOCALTEMP" != "" ]
+if [ "${LOCALTEMP}" != "" ]
 then
-	mv "$LOCALTEMP" "$LOCAL"
+	mv "${LOCALTEMP}" "${LOCAL}"
 	LOCALTEMP=$LOCALACT
 fi
