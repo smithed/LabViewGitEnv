@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 # Read System wide config
 if [ -e /usr/local/etc/LVConfig.sh ]

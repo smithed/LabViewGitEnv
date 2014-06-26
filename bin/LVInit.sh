@@ -4,18 +4,18 @@ OPT=$(echo $1 | tr "[:upper:]" "[:lower:]")
 
 function do_git_config {
 	$1 --remove-section diff.labview
-	$1 diff.labview.command "${DIFFCMD}"
+	$1 diff.labview.command "LVCompareWrapper.sh"
 	$1 diff.labview.tool labview
 	$1 diff.labview.guitool labview
 	$1 --remove-section difftool.labview
-	$1 difftool.labview.cmd "${DIFFCMD} \"\$LOCAL\" \"\$REMOTE\""
+	$1 difftool.labview.cmd "LVCompareWrapper.sh \"\$LOCAL\" \"\$REMOTE\""
 	$1 difftool.labview.prompt false
 	$1 --remove-section merge.labview
 	$1 merge.labview.tool labview
 	$1 merge.labview.name "LabView Merge Driver"
-	$1 merge.labview.driver "${MERGECMD} \"%O\" \"%B\" \"%A\" \"%A\""
+	$1 merge.labview.driver "/usr/local/bin/LVMergeWrapper.sh \"%O\" \"%B\" \"%A\""
 	$1 --remove-section mergetool.labview
-	$1 mergetool.labview.cmd "${MERGECMD} \"\$BASE\" \"\$REMOTE\" \"\$LOCAL\" \"\$MERGED\""
+	$1 mergetool.labview.cmd "/usr/local/bin/LVMergeWrapper.sh \"\$BASE\" \"\$REMOTE\" \"\$LOCAL\" \"\$MERGED\""
 	$1 mergetool.labview.trustExitCode false
 	if [ $OPT == "--global" ]
 	then
@@ -27,21 +27,19 @@ case "$OPT" in
 	--system)
 		GIT_CONFIG_OPTS="--system"
 		ATTRIBUTES_FILE=/etc/gitattributes
-		DIFFCMD='"/usr/local/bin/LVCompareWrapper.sh"'
-		MERGECMD='"/usr/local/bin/LVMergeWrapper.sh"'
 	;;
 	--global)
 		GIT_CONFIG_OPTS="--global"
 		ATTRIBUTES_FILE=~/.gitattributes
-		DIFFCMD='"~/bin/LVCompareWrapper.sh"'
-		MERGECMD='"~/bin/LVMergeWrapper.sh"'
+		DIFFCMD="~/bin/LVCompareWrapper.sh"
+		MERGECMD="~/bin/LVMergeWrapper.sh"
 	;;
 	--local)
 		git status &> /dev/null || { echo "You are not in a GIT Repository"; exit 0; }
 		GIT_CONFIG_OPTS="--local"
 		ATTRIBUTES_FILE=.git/info/attributes
-		DIFFCMD='"'$(PWD)'/bin/LVCompareWrapper.sh"'
-		MERGECMD='"'$(PWD)'/bin/LVMergeWrapper.sh"'
+		DIFFCMD="\""$(PWD)"/bin/LVCompareWrapper.sh\""
+		MERGECMD="\""$(PWD)"/bin/LVMergeWrapper.sh\""
 	;;
 	*) 
 		echo -e "Usage: \"$0 option\" where option can be one of the following
